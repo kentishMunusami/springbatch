@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import com.opencodez.entity.Employee;
 import com.opencodez.entity.Users;
 
 @Component
@@ -28,11 +29,20 @@ public class AccountKeeperJob extends JobExecutionListenerSupport {
 	@Value("${input.file}") 
 	Resource resource;
 	
+	@Value("${input.file2}") 
+	Resource resource2;
+	
 	@Autowired
 	Processor processor;
 	
 	@Autowired
 	Writer writer;
+	
+	@Autowired
+	ProcessorEmployee processor2;
+	
+	@Autowired
+	WriterEmployee writer2;
 	
 	@Bean(name = "accountJob")
 	public Job accountKeeperJob() {
@@ -44,10 +54,18 @@ public class AccountKeeperJob extends JobExecutionListenerSupport {
 				.writer(writer)
 				.build();
 		
+		Step step2 = stepBuilderFactory.get("step-2")
+				.<Employee, Employee> chunk(1)
+				.reader(new ReaderEmployee(resource2))
+				.processor(processor2)
+				.writer(writer2)
+				.build();
+		
 		Job job = jobBuilderFactory.get("accounting-job")
 				.incrementer(new RunIdIncrementer())
 				.listener(this)
 				.start(step)
+				.next(step2)
 				.build();
 
 		return job;
@@ -56,7 +74,7 @@ public class AccountKeeperJob extends JobExecutionListenerSupport {
 	@Override
 	public void afterJob(JobExecution jobExecution) {
 		if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
-			System.out.println("BATCH JOB COMPLETED SUCCESSFULLY");
+			System.out.println("###########################BATCH JOB COMPLETED SUCCESSFULLY#############################");
 		}
 	}
 

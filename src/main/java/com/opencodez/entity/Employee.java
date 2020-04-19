@@ -6,11 +6,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
 @Entity
 public class Employee {
 	@Id
@@ -18,8 +16,8 @@ public class Employee {
 	@Column(name="id_employee")
 	private int idEmployee;
 	
-    private String firstName;
-    private String lastName;
+    private String firstname;
+    private String lastname;
     private int age;
     private float salary;
 
